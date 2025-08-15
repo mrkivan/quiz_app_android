@@ -1,26 +1,32 @@
 package com.tnm.quizmaster.presentation.quizSets.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.tnm.quizmaster.NavKeys
 import com.tnm.quizmaster.QuizMasterDestinations
 import com.tnm.quizmaster.domain.model.quizset.QuizSetData
 import com.tnm.quizmaster.domain.model.result.ResultData
 import com.tnm.quizmaster.presentation.utils.ui.BaseCardView
+import com.tnm.quizmaster.presentation.utils.ui.CircleWithNumber
 import com.tnm.quizmaster.presentation.utils.ui.TvQuizBodyDesc
 import com.tnm.quizmaster.presentation.utils.ui.TvQuizBodyTitle
 
@@ -36,20 +42,37 @@ fun QuizSetScreenItem(
         modifier = modifier,
         onClick = onClick,
         bodyContent = {
-            TvQuizBodyTitle(section.title)
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                CircleWithNumber(section.position)
+                Column(
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .weight(1f),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    TvQuizBodyTitle(section.title)
 
-            Spacer(modifier = Modifier.height(5.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
 
-            TvQuizBodyDesc(section.description)
+                    TvQuizBodyDesc(section.description)
+                }
 
-
-            PreviousResultButton(previousResult) {
-                navController.currentBackStackEntry?.savedStateHandle?.set(
-                    NavKeys.DATA_KEY_RESULT,
-                    section.fileName
-                )
-                navController.navigate(QuizMasterDestinations.ROUTE_RESULT)
             }
+
+            previousResult?.let {
+                Spacer(modifier = Modifier.height(4.dp))
+                PreviousResultButton(it) {
+                    navController.currentBackStackEntry?.savedStateHandle?.set(
+                        NavKeys.DATA_KEY_RESULT,
+                        section.fileName
+                    )
+                    navController.navigate(QuizMasterDestinations.ROUTE_RESULT)
+                }
+            }
+
         }
     )
 }
@@ -80,6 +103,21 @@ fun PreviousResultButton(resultData: ResultData?, navigateToResultView: () -> Un
                 contentDescription = "Navigate to result"
             )
         }
+
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun QuizSetScreenItemPreview() {
+    MaterialTheme {
+        QuizSetScreenItem(
+            section = getMockQuizSetData(),
+            previousResult = null,
+            onClick = {},
+            navController = rememberNavController(),
+            modifier = Modifier,
+        )
 
     }
 }
