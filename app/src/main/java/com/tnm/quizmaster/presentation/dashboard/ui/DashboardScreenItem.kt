@@ -3,11 +3,8 @@ package com.tnm.quizmaster.presentation.dashboard.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,6 +16,8 @@ import com.tnm.quizmaster.R
 import com.tnm.quizmaster.domain.model.dashboard.DashboardData
 import com.tnm.quizmaster.presentation.utils.ui.BaseCardView
 import com.tnm.quizmaster.presentation.utils.ui.CircleWithNumber
+import com.tnm.quizmaster.presentation.utils.ui.SpacerLargeWidth
+import com.tnm.quizmaster.presentation.utils.ui.SpacerMediumWidth
 import com.tnm.quizmaster.presentation.utils.ui.TvDashboardTitle
 
 @Composable
@@ -29,22 +28,21 @@ fun DashboardScreenItem(item: DashboardData.Item, onClick: () -> Unit) {
         bodyContent = {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
                 Image(
                     painter = painterResource(id = getIcon(item.sectionId)),
                     contentDescription = "${item.title} Icon",
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(32.dp)
                 )
 
-                Spacer(modifier = Modifier.width(16.dp))
+                SpacerLargeWidth()
 
                 TvDashboardTitle(item.title, Modifier.weight(1f))
 
-                Spacer(modifier = Modifier.width(8.dp))
+                SpacerMediumWidth()
 
                 CircleWithNumber(item.total)
             }

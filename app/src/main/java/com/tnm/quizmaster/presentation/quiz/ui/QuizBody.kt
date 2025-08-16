@@ -7,12 +7,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,6 +34,7 @@ import com.tnm.quizmaster.domain.model.quiz.QuizData
 import com.tnm.quizmaster.presentation.quiz.state.QuizState
 import com.tnm.quizmaster.presentation.utils.ui.ConfirmDialog
 import com.tnm.quizmaster.presentation.utils.ui.QuizProgressWithShape
+import com.tnm.quizmaster.presentation.utils.ui.SpacerLargeHeight
 import com.tnm.quizmaster.presentation.utils.ui.TvHeadSmall
 import com.tnm.quizmaster.presentation.utils.ui.TvLarge
 import com.tnm.quizmaster.presentation.utils.ui.TvMedium
@@ -51,7 +49,7 @@ fun QuizBody(
     moveToNextQuestion: () -> Unit,
     navigateToResultScreen: () -> Unit,
 ) {
-    var showSkipDialog = remember { mutableStateOf(false) }
+    val showSkipDialog = remember { mutableStateOf(false) }
     ConfirmDialog(
         title = "Skip this question",
         message = "Do you really want to skip this?",
@@ -99,7 +97,7 @@ fun QuizBody(
                     .weight(1f)
                     .fillMaxWidth()
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
+                SpacerLargeHeight()
 
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
@@ -177,7 +175,7 @@ fun QuizBody(
 
                 // Explanation
                 if (quizState.showExplanation) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    SpacerLargeHeight()
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
@@ -205,7 +203,7 @@ fun QuizBody(
                 ) {
                     Text(stringResource(R.string.btn_skip))
                 }
-                Spacer(modifier = Modifier.width(16.dp))
+                SpacerLargeHeight()
                 Button(
                     onClick = { submitAnswer() },
                     enabled = quizState.selectedAnswers.isNotEmpty() && !quizState.isSubmitted,
@@ -213,7 +211,7 @@ fun QuizBody(
                 ) {
                     Text(stringResource(R.string.btn_submit))
                 }
-                Spacer(modifier = Modifier.width(16.dp))
+                SpacerLargeHeight()
                 Button(
                     onClick = {
                         if (quizState.isLastItem) {

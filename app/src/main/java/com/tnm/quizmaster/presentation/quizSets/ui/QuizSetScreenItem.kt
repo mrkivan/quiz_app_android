@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
@@ -28,6 +26,8 @@ import com.tnm.quizmaster.domain.model.quizset.QuizSetData
 import com.tnm.quizmaster.domain.model.result.ResultData
 import com.tnm.quizmaster.presentation.utils.ui.BaseCardView
 import com.tnm.quizmaster.presentation.utils.ui.CircleWithNumber
+import com.tnm.quizmaster.presentation.utils.ui.SpacerLargeHeight
+import com.tnm.quizmaster.presentation.utils.ui.SpacerSmallHeight
 import com.tnm.quizmaster.presentation.utils.ui.TvQuizBodyDesc
 import com.tnm.quizmaster.presentation.utils.ui.TvQuizBodyTitle
 
@@ -60,12 +60,12 @@ fun QuizSetScreenItem(
                     ) {
                         TvQuizBodyTitle(section.title)
 
-                        Spacer(modifier = Modifier.height(4.dp))
+                        SpacerSmallHeight()
 
                         TvQuizBodyDesc(section.description)
 
                         previousResult?.let {
-                            Spacer(modifier = Modifier.height(4.dp))
+                            SpacerSmallHeight()
                             PreviousResultButton(it) {
                                 navController.currentBackStackEntry?.savedStateHandle?.set(
                                     NavKeys.DATA_KEY_RESULT,
@@ -96,7 +96,7 @@ fun PreviousResultButton(resultData: ResultData?, navigateToResultView: () -> Un
     val resultPercentage = if (totalQuestions > 0) {
         (correctAnswers * 100f / totalQuestions).toInt()
     } else 0
-    Spacer(modifier = Modifier.height(16.dp))
+    SpacerLargeHeight()
     Button(
         onClick = { navigateToResultView() },
         modifier = Modifier.fillMaxWidth(),
