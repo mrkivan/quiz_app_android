@@ -119,8 +119,8 @@ fun ResultReportCard(data: ResultData) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(text = "Total Questions: $totalQuestions")
-                    Text(text = "Correct Answers: $correctAnswers")
+                    Text(text = stringResource(id = R.string.result_total_questions, totalQuestions))
+                    Text(text = stringResource(id = R.string.result_correct_answers, correctAnswers))
                 }
 
                 // Right side: Circular progress

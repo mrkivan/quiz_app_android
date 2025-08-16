@@ -46,7 +46,6 @@ fun QuizScreen(
     val uiState by viewModel.state.collectAsState()
     val quizState by viewModel.quizState.collectAsState()
     val showExitConfirmationDialog = remember { mutableStateOf(false) }
-    val showSubmitConfirmationDialog = remember { mutableStateOf(false) }
 
     LaunchedEffect(quizId) {
         if (quizId > 0) {
@@ -76,27 +75,15 @@ fun QuizScreen(
 
     // UI
     ConfirmDialog(
-        title = "Submit Quiz",
-        message = "Are you sure you want to submit this?",
+        title = stringResource(R.string.dialog_exit_title),
+        message = stringResource(R.string.dialog_exit_message),
         onConfirm = {
             // Actually exit screen
             navController.popBackStack()
         },
-        confirmButtonLabel = "Confirm",
-        showDialogState = showSubmitConfirmationDialog
-    )
-
-    ConfirmDialog(
-        title = "Exit Quiz",
-        message = "Are you sure you want to exit?",
-        onConfirm = {
-            // Actually exit screen
-            navController.popBackStack()
-        },
-        confirmButtonLabel = "Confirm",
+        confirmButtonLabel = stringResource(R.string.btn_confirm),
         showDialogState = showExitConfirmationDialog
     )
-
 
     PlaceholderScaffold(
         toolbarConfig = QuizAppToolbar(

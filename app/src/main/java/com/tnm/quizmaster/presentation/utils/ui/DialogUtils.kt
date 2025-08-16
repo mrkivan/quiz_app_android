@@ -6,6 +6,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.res.stringResource
+import com.tnm.quizmaster.R
 
 @Composable
 fun ConfirmDialog(
@@ -41,7 +43,7 @@ fun ConfirmDialog(
                     showDialogState.value = false
                     onCancel?.invoke()
                 }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.btn_cancel))
                 }
             }
         )
