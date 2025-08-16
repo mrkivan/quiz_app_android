@@ -26,7 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.tnm.quizmaster.R
 import com.tnm.quizmaster.domain.model.quiz.QuizData
 import com.tnm.quizmaster.presentation.quiz.state.QuizState
+import com.tnm.quizmaster.presentation.utils.ui.QuizProgressWithShape
 import com.tnm.quizmaster.presentation.utils.ui.TvHeadSmall
 import com.tnm.quizmaster.presentation.utils.ui.TvLarge
 import com.tnm.quizmaster.presentation.utils.ui.TvMedium
@@ -71,30 +71,11 @@ fun QuizBody(
                             .weight(1f)
                             .padding(end = 8.dp)
                     )
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.Top)
-                            .clip(
-                                shape = RoundedCornerShape(
-                                    topStart = 16.dp,
-                                    bottomEnd = 16.dp,
-                                    bottomStart = 0.dp,
-                                    topEnd = 0.dp
-                                )
-                            )
-                            .background(Color(0xFF8000FF))
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = stringResource(
-                                R.string.question_progress,
-                                quizState.currentQuestionNumber,
-                                quizState.totalQuestions
-                            ),
-                            color = Color.White,
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
+                    QuizProgressWithShape(
+                        currentQuestion = quizState.currentQuestionNumber,
+                        totalQuestions = quizState.totalQuestions,
+                        modifier = Modifier.align(Alignment.Top)
+                    )
                 }
             }
             // Question and Answer Options
@@ -147,7 +128,7 @@ fun QuizBody(
                                         shape = RoundedCornerShape(8.dp)
                                     )
                                     .background(backgroundColor)
-                                    .padding(16.dp),
+                                    .padding(8.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 if (quizData.answerCellType == 0) {
@@ -188,9 +169,7 @@ fun QuizBody(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     ) {
-
                         TvMedium(quizData.explanation, Modifier.padding(16.dp))
-
                     }
                 }
             }
