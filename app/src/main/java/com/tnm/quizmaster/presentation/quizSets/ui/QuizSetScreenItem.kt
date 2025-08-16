@@ -1,6 +1,7 @@
 package com.tnm.quizmaster.presentation.quizSets.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -38,43 +39,59 @@ fun QuizSetScreenItem(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
-    BaseCardView(
-        modifier = modifier,
-        onClick = onClick,
-        bodyContent = {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                CircleWithNumber(section.position)
-                Column(
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .weight(1f),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    TvQuizBodyTitle(section.title)
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            BaseCardView(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+                onClick = onClick,
+                bodyContent = {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(start = 8.dp)
+                                .weight(1f),
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            TvQuizBodyTitle(section.title)
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
 
-                    TvQuizBodyDesc(section.description)
+                            TvQuizBodyDesc(section.description)
+                        }
+
+                    }
+
+                    previousResult?.let {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        PreviousResultButton(it) {
+                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                NavKeys.DATA_KEY_RESULT,
+                                section.fileName
+                            )
+                            navController.navigate(QuizMasterDestinations.ROUTE_RESULT)
+                        }
+                    }
+
                 }
+            )
 
-            }
-
-            previousResult?.let {
-                Spacer(modifier = Modifier.height(4.dp))
-                PreviousResultButton(it) {
-                    navController.currentBackStackEntry?.savedStateHandle?.set(
-                        NavKeys.DATA_KEY_RESULT,
-                        section.fileName
-                    )
-                    navController.navigate(QuizMasterDestinations.ROUTE_RESULT)
-                }
-            }
-
+            CircleWithNumber(
+                number = section.position,
+                modifier = Modifier.align(Alignment.CenterStart)
+            )
         }
-    )
+
+    }
 }
 
 @Composable

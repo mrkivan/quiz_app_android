@@ -76,7 +76,7 @@ fun QuizSetScreen(
             state = rememberLazyListState(),
             modifier = modifier
                 .fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
+            contentPadding = PaddingValues(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(

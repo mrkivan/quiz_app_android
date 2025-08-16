@@ -13,13 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tnm.quizmaster.R
 import com.tnm.quizmaster.domain.model.dashboard.DashboardData
 import com.tnm.quizmaster.presentation.utils.ui.BaseCardView
-import com.tnm.quizmaster.presentation.utils.ui.TvDashboardSetNumbs
+import com.tnm.quizmaster.presentation.utils.ui.CircleWithNumber
 import com.tnm.quizmaster.presentation.utils.ui.TvDashboardTitle
 
 @Composable
@@ -47,7 +46,7 @@ fun DashboardScreenItem(item: DashboardData.Item, onClick: () -> Unit) {
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                TvDashboardSetNumbs(stringResource(R.string.item_total, item.total))
+                CircleWithNumber(item.total)
             }
         }
     )

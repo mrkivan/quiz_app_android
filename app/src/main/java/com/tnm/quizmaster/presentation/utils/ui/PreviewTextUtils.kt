@@ -22,14 +22,6 @@ fun PreviewTvDashboardTitle() {
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewTvDashboardSetNumbs() {
-    MaterialTheme {
-        TvDashboardSetNumbs(text = "(10)")
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
 fun PreviewTvQuizBodyTitle() {
     MaterialTheme {
         TvQuizBodyTitle(text = "Quiz Question Title Example")
