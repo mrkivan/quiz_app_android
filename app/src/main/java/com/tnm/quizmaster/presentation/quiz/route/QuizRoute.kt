@@ -9,12 +9,15 @@ import com.tnm.quizmaster.presentation.quiz.viewmodel.QuizViewModel
 @Composable
 fun QuizRoute(
     navController: NavHostController,
-    quizScreenData: QuizScreenData,
+    quizScreenData: QuizScreenData? = null,
+    quizId: Int,
     viewModel: QuizViewModel = hiltViewModel()
 ) {
+
     QuizScreen(
         viewModel = viewModel,
         quizScreenData = quizScreenData,
+        quizId = quizId,
         navController = navController,
     )
 }

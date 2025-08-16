@@ -19,7 +19,8 @@ data class ResultData(
         val result: Boolean,
         val answerSectionTitle: String? = null,
         val correctAnswer: List<String>,
-        val explanation: String
+        val explanation: String,
+        val isSkipped: Boolean = false
     ) : Parcelable
 
 }

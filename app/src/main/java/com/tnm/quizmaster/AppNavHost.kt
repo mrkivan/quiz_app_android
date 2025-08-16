@@ -4,9 +4,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.tnm.quizmaster.QuizMasterDestinations.ARG_QUIZ_ID
 import com.tnm.quizmaster.QuizMasterDestinations.ROUTE_HOME
 import com.tnm.quizmaster.QuizMasterDestinations.ROUTE_QUIZ
 import com.tnm.quizmaster.QuizMasterDestinations.ROUTE_QUIZ_SET
@@ -22,6 +25,8 @@ object QuizMasterDestinations {
     const val ROUTE_QUIZ_SET = "quiz_list"
     const val ROUTE_QUIZ = "quiz"
     const val ROUTE_RESULT = "result"
+
+    const val ARG_QUIZ_ID = "quizId"
 }
 
 object NavKeys {
@@ -55,22 +60,26 @@ fun AppNavHost(
             )
 
         }
-        composable(route = ROUTE_QUIZ) {
-
-            val quizScreenData =
-                navController.previousBackStackEntry?.savedStateHandle?.get<QuizScreenData>(NavKeys.DATA_KEY_QUIZ)
-
-            if (quizScreenData != null) {
-                QuizRoute(navController, quizScreenData)
-            } else {
-                Text("Error: Item not found")
-            }
-        }
         composable(route = ROUTE_RESULT) {
             val resultKey =
                 navController.previousBackStackEntry?.savedStateHandle?.get<String>(NavKeys.DATA_KEY_RESULT)
 
             ResultRoute(navController, resultKey.orEmpty())
         }
+        composable(
+            route = "$ROUTE_QUIZ/{$ARG_QUIZ_ID}",
+            arguments = listOf(navArgument(ARG_QUIZ_ID) { type = NavType.IntType })
+        ) { backStackEntry ->
+            val quizScreenData =
+                navController.previousBackStackEntry?.savedStateHandle?.get<QuizScreenData>(NavKeys.DATA_KEY_QUIZ)
+            val quizId = backStackEntry.arguments?.getInt(ARG_QUIZ_ID) ?: -1
+            if (quizScreenData != null) {
+                QuizRoute(navController, quizScreenData, quizId)
+            } else {
+                Text("Error: Item not found")
+            }
+
+        }
+
     }
 }

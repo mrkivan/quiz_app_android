@@ -46,12 +46,9 @@ class QuizViewModel @Inject constructor(
                 navigateToResultScreen()
             }
 
+            QuizIntent.SkipQuestion,
             QuizIntent.NextQuestion -> {
                 moveToNextQuestion()
-            }
-
-            QuizIntent.SkipQuestion -> {
-                skipQuestion()
             }
 
             QuizIntent.SubmitAnswer -> {
@@ -94,16 +91,21 @@ class QuizViewModel @Inject constructor(
     }
 
     private fun skipQuestion() {
-        _quizState.value = _quizState.value.copy(
+        /*_quizState.value = _quizState.value.copy(
             isSubmitted = false,
             showExplanation = false,
             selectedAnswers = emptyList()
-        )
+        )*/
         moveToNextQuestion()
     }
 
-    private fun moveToNextQuestion() {
-        saveResult()
+    fun showExitConfirmationDialog(): Boolean {
+        return (getQuizId() > 1 || _quizState.value.selectedAnswers.isNotEmpty())
+    }
+
+    fun getQuizId() = currentQuizPosition + 1
+    private fun moveToNextQuestion(isSkipped: Boolean = false) {
+        saveResult(isSkipped)
 
         val currentData: QuizScreenData? = (state.value as? QuizAppUiState.Success)?.data
         currentData?.let { data ->
@@ -138,14 +140,18 @@ class QuizViewModel @Inject constructor(
 
         val currentData: QuizScreenData? = (state.value as? QuizAppUiState.Success)?.data
         currentData?.let { data ->
+
+            val correctAnswers = getCorrectResultsCount()
+
             val resultData = ResultData(
                 quizTitle = data.quizTitle,
                 quizDescription = data.quizDescription,
                 resultItems = this.resultItems.toList(),
-                totalCorrectAnswers = getCorrectResultsCount(),
+                totalCorrectAnswers = correctAnswers,
                 totalQuestions = cacheQuizList.count(),
-                resultPercentage = getResultPercentage(),
+                resultPercentage = getResultPercentage(correctAnswers),
             )
+
             viewModelScope.launch {
                 saveResultDataUseCase(data.quizSection?.fileName.orEmpty(), resultData)
                     .collect {
@@ -162,8 +168,7 @@ class QuizViewModel @Inject constructor(
     }
 
     @SuppressLint("DefaultLocale")
-    fun getResultPercentage(): String {
-        val correctAnswers = getCorrectResultsCount()
+    fun getResultPercentage(correctAnswers: Int): String {
         val totalQuestions = cacheQuizList.count()
         return if (totalQuestions > 0) {
             val percentage = (correctAnswers.toDouble() / totalQuestions.toDouble()) * 100
@@ -185,7 +190,7 @@ class QuizViewModel @Inject constructor(
         return ""
     }
 
-    private fun saveResult() {
+    private fun saveResult(isSkipped: Boolean = false) {
         val currentQuiz = cacheQuizList[currentQuizPosition]
 
         val resultItem = ResultData.Item(
@@ -194,6 +199,7 @@ class QuizViewModel @Inject constructor(
             result = currentQuiz.correctAnswer.answerId.toSet() == _quizState.value.selectedAnswers.toSet(),
             correctAnswer = currentQuiz.correctAnswer.answer,
             explanation = currentQuiz.explanation,
+            isSkipped = isSkipped
         )
         resultItems.add(resultItem)
     }

@@ -24,6 +24,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.tnm.quizmaster.R
 import com.tnm.quizmaster.domain.model.quiz.QuizData
 import com.tnm.quizmaster.presentation.quiz.state.QuizState
+import com.tnm.quizmaster.presentation.utils.ui.ConfirmDialog
 import com.tnm.quizmaster.presentation.utils.ui.QuizProgressWithShape
 import com.tnm.quizmaster.presentation.utils.ui.TvHeadSmall
 import com.tnm.quizmaster.presentation.utils.ui.TvLarge
@@ -48,6 +51,18 @@ fun QuizBody(
     moveToNextQuestion: () -> Unit,
     navigateToResultScreen: () -> Unit,
 ) {
+    var showSkipDialog = remember { mutableStateOf(false) }
+    ConfirmDialog(
+        title = "Skip this question",
+        message = "Do you really want to skip this?",
+        confirmButtonLabel = "Skip",
+        onConfirm = {
+            skipQuestion()
+        },
+        showDialogState = showSkipDialog
+    )
+
+
     Box {
         Column(
             modifier = Modifier
@@ -183,7 +198,7 @@ fun QuizBody(
             ) {
                 Button(
                     onClick = {
-                        skipQuestion()
+                        showSkipDialog.value = true
                     },
                     enabled = !quizState.isSubmitted && quizState.selectedAnswers.isEmpty() && !quizState.isLastItem,
                     modifier = Modifier.weight(1f)

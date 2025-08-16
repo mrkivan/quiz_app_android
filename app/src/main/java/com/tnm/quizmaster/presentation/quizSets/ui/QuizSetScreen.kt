@@ -52,8 +52,7 @@ fun QuizSetScreen(
                         NavKeys.DATA_KEY_QUIZ,
                         event.data
                     )
-                    navController.navigate(QuizMasterDestinations.ROUTE_QUIZ)
-
+                    navController.navigate(QuizMasterDestinations.ROUTE_QUIZ + "/0")
                 }
             }
         }

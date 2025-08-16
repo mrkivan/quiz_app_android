@@ -40,7 +40,7 @@ fun QuizSetScreenItem(
     modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .padding(horizontal = 8.dp)
     ) {
         Box(
@@ -52,46 +52,39 @@ fun QuizSetScreenItem(
                     .padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
                 onClick = onClick,
                 bodyContent = {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
+
+                    Column(
+                        modifier = Modifier
+                            .padding(start = 16.dp),
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(start = 8.dp)
-                                .weight(1f),
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            TvQuizBodyTitle(section.title)
+                        TvQuizBodyTitle(section.title)
 
-                            Spacer(modifier = Modifier.height(4.dp))
-
-                            TvQuizBodyDesc(section.description)
-                        }
-
-                    }
-
-                    previousResult?.let {
                         Spacer(modifier = Modifier.height(4.dp))
-                        PreviousResultButton(it) {
-                            navController.currentBackStackEntry?.savedStateHandle?.set(
-                                NavKeys.DATA_KEY_RESULT,
-                                section.fileName
-                            )
-                            navController.navigate(QuizMasterDestinations.ROUTE_RESULT)
-                        }
-                    }
 
-                }
+                        TvQuizBodyDesc(section.description)
+
+                        previousResult?.let {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            PreviousResultButton(it) {
+                                navController.currentBackStackEntry?.savedStateHandle?.set(
+                                    NavKeys.DATA_KEY_RESULT,
+                                    section.fileName
+                                )
+                                navController.navigate(QuizMasterDestinations.ROUTE_RESULT)
+                            }
+                        }
+                    }// Column end
+                }// BaseCardView end
             )
 
             CircleWithNumber(
                 number = section.position,
                 modifier = Modifier.align(Alignment.CenterStart)
             )
-        }
+        }// box with circle end
 
-    }
+    }// main box end
 }
 
 @Composable
@@ -130,11 +123,10 @@ fun QuizSetScreenItemPreview() {
     MaterialTheme {
         QuizSetScreenItem(
             section = getMockQuizSetData(),
-            previousResult = null,
+            previousResult = generateMockResultData(),
             onClick = {},
             navController = rememberNavController(),
             modifier = Modifier,
         )
-
     }
 }
