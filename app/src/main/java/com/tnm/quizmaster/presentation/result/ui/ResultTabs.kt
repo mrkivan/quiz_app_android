@@ -3,10 +3,8 @@ package com.tnm.quizmaster.presentation.result.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
@@ -25,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tnm.quizmaster.domain.model.result.ResultData
 import com.tnm.quizmaster.presentation.utils.ui.AppCardDefaults
+import com.tnm.quizmaster.presentation.utils.ui.SpacerMediumHeight
 import com.tnm.quizmaster.presentation.utils.ui.SpacerSmallHeight
 
 @Composable
@@ -58,18 +57,18 @@ fun ResultTabs(
                 )
             }
         }
+        SpacerMediumHeight()
 
+        val filteredItems = if (selectedTabIndex == 0 && correctItems.isNotEmpty()) {
+            correctItems
+        } else {
+            incorrectItems
+        }
 
-        // Content for selected tab
-        val itemsToShow = tabs[selectedTabIndex].second
-
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(16.dp)
-        ) {
-            items(itemsToShow.size) { item ->
-                ResultItemRow(itemsToShow[item])
+        // ⚡ Important: Use Column here, not LazyColumn
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            filteredItems.forEach { item ->
+                ResultItemRow(item)
             }
         }
     }
