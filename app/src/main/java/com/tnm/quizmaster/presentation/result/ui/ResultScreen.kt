@@ -8,16 +8,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,6 +40,7 @@ import com.tnm.quizmaster.presentation.utils.ui.AppCardDefaults
 import com.tnm.quizmaster.presentation.utils.ui.CircularPercentageProgress
 import com.tnm.quizmaster.presentation.utils.ui.PlaceholderScaffold
 import com.tnm.quizmaster.presentation.utils.ui.QuizAppToolbar
+import com.tnm.quizmaster.presentation.utils.ui.SpacerMediumHeight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,9 +50,13 @@ fun ResultScreen(
     navController: NavHostController
 ) {
     val uiState by viewModel.state.collectAsState()
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+
     LaunchedEffect(Unit) {
         viewModel.getResult(key)
     }
+    // 1️⃣ Prepare filtered lists once
+
     PlaceholderScaffold(
         toolbarConfig = QuizAppToolbar(
             title = when (uiState) {
@@ -61,6 +72,24 @@ fun ResultScreen(
         modifier = Modifier
 
     ) { paddingValues, data ->
+        // 1. Prepare filtered lists once
+        val currentItems = remember(data.resultItems) { data.resultItems.filter { it.result } }
+        val skippedItems = remember(data.resultItems) { data.resultItems.filter { it.isSkipped } }
+        val incorrectItems =
+            remember(data.resultItems) { data.resultItems.filter { !it.result && !it.isSkipped } }
+        val currentTabTitle = stringResource(R.string.tab_current, currentItems.size)
+        val skippedTabTitle = stringResource(R.string.tab_skipped, skippedItems.size)
+        val incorrectTabTitle = stringResource(R.string.tab_incorrect, incorrectItems.size)
+
+        // 2. Build dynamic tabs
+        val tabs = remember(data.resultItems) {
+            mutableListOf<Pair<String, List<ResultData.Item>>>().apply {
+                if (currentItems.isNotEmpty()) add(currentTabTitle to currentItems)
+                if (skippedItems.isNotEmpty()) add(skippedTabTitle to skippedItems)
+                if (incorrectItems.isNotEmpty()) add(incorrectTabTitle to incorrectItems)
+            }
+        }
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -71,10 +100,30 @@ fun ResultScreen(
             item {
                 ResultReportCard(data)
             }
-
-            // Bottom: Tabbed result list (itself shouldn't be a LazyColumn)
+            // TabRow
             item {
-                ResultTabs(resultItems = data.resultItems)
+                Column {
+                    TabRow(selectedTabIndex = selectedTabIndex) {
+                        tabs.forEachIndexed { index, tab ->
+                            Tab(
+                                selected = selectedTabIndex == index,
+                                onClick = { selectedTabIndex = index },
+                                text = { Text(tab.first) }
+                            )
+                        }
+                    }
+                    SpacerMediumHeight()
+                }
+            }
+            // Filtered items for selected tab
+            val filteredItems = tabs.getOrNull(selectedTabIndex)?.second ?: emptyList()
+
+            // Add each item as a LazyColumn item with stable key
+            items(
+                items = filteredItems,
+                key = { it.questionId } // use a stable unique ID if available
+            ) { item ->
+                ResultItemRow(item)
             }
         }
     }
@@ -119,8 +168,18 @@ fun ResultReportCard(data: ResultData) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(text = stringResource(id = R.string.result_total_questions, totalQuestions))
-                    Text(text = stringResource(id = R.string.result_correct_answers, correctAnswers))
+                    Text(
+                        text = stringResource(
+                            id = R.string.result_total_questions,
+                            totalQuestions
+                        )
+                    )
+                    Text(
+                        text = stringResource(
+                            id = R.string.result_correct_answers,
+                            correctAnswers
+                        )
+                    )
                 }
 
                 // Right side: Circular progress

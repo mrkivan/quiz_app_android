@@ -7,6 +7,9 @@
     <string name="explanation">Explanation: %1$s</string>
     <string name="result_total_questions">Total Questions: %1$d</string>
     <string name="result_correct_answers">Correct Answers: %1$d</string>
+    <string name="tab_current">Current (%1$d)</string>
+    <string name="tab_skipped">Skipped (%1$d)</string>
+    <string name="tab_incorrect">Incorrect (%1$d)</string>
     <!--Button strings-->
     <string name="btn_confirm">Confirm</string>
     <string name="btn_cancel">Cancel</string>

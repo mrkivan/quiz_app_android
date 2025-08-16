@@ -46,7 +46,10 @@ class QuizViewModel @Inject constructor(
                 navigateToResultScreen()
             }
 
-            QuizIntent.SkipQuestion,
+            QuizIntent.SkipQuestion -> {
+                moveToNextQuestion(isSkipped = true)
+            }
+
             QuizIntent.NextQuestion -> {
                 moveToNextQuestion()
             }
