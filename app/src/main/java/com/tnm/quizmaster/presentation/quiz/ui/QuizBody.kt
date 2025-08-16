@@ -35,6 +35,7 @@ import com.tnm.quizmaster.presentation.quiz.state.QuizState
 import com.tnm.quizmaster.presentation.utils.ui.ConfirmDialog
 import com.tnm.quizmaster.presentation.utils.ui.QuizProgressWithShape
 import com.tnm.quizmaster.presentation.utils.ui.SpacerLargeHeight
+import com.tnm.quizmaster.presentation.utils.ui.SpacerLargeWidth
 import com.tnm.quizmaster.presentation.utils.ui.TvHeadSmall
 import com.tnm.quizmaster.presentation.utils.ui.TvLarge
 import com.tnm.quizmaster.presentation.utils.ui.TvMedium
@@ -203,7 +204,7 @@ fun QuizBody(
                 ) {
                     Text(stringResource(R.string.btn_skip))
                 }
-                SpacerLargeHeight()
+                SpacerLargeWidth()
                 Button(
                     onClick = { submitAnswer() },
                     enabled = quizState.selectedAnswers.isNotEmpty() && !quizState.isSubmitted,
@@ -211,7 +212,7 @@ fun QuizBody(
                 ) {
                     Text(stringResource(R.string.btn_submit))
                 }
-                SpacerLargeHeight()
+                SpacerLargeWidth()
                 Button(
                     onClick = {
                         if (quizState.isLastItem) {
