@@ -86,6 +86,7 @@ fun QuizBody(
                 ) {
                     itemsIndexed(quizData.answerCellList) { index, answer ->
                         val isCorrect = quizData.correctAnswer.answerId.contains(answer.answerId)
+
                         val isSelected = quizState.selectedAnswers.contains(answer.answerId)
                         val backgroundColor = when {
                             !quizState.isSubmitted -> MaterialTheme.colorScheme.surface

@@ -5,6 +5,8 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
@@ -22,6 +24,7 @@ import com.tnm.quizmaster.R
 import com.tnm.quizmaster.presentation.quiz.intent.QuizIntent
 import com.tnm.quizmaster.presentation.quiz.intent.QuizNavEvent
 import com.tnm.quizmaster.presentation.quiz.route.QuizScreenData
+import com.tnm.quizmaster.presentation.quiz.ui.animation.QuizOverlayAnimation
 import com.tnm.quizmaster.presentation.quiz.viewmodel.QuizViewModel
 import com.tnm.quizmaster.presentation.utils.state.QuizAppUiState
 import com.tnm.quizmaster.presentation.utils.ui.ConfirmDialog
@@ -45,6 +48,8 @@ fun QuizScreen(
 
     val uiState by viewModel.state.collectAsState()
     val quizState by viewModel.quizState.collectAsState()
+    val quizResultState by viewModel.quizResultState.collectAsState()
+
     val showExitConfirmationDialog = remember { mutableStateOf(false) }
 
     LaunchedEffect(quizId) {
@@ -110,25 +115,35 @@ fun QuizScreen(
             label = "quiz-slide"
         ) { data ->
             Log.d("QuizScreen", "QuizScreen: ${data.quizTitle}")
-            QuizBody(
-                quizData = viewModel.getQuiz(),
-                quizState = quizState,
-                updateSelectedAnswers = { answers ->
-                    viewModel.handleIntent(QuizIntent.UpdateSelectedAnswers(answers))
-                },
-                submitAnswer = {
-                    viewModel.handleIntent(QuizIntent.SubmitAnswer)
-                },
-                skipQuestion = {
-                    navigateToNextQuestion()
-                },
-                moveToNextQuestion = {
-                    navigateToNextQuestion()
-                },
-                navigateToResultScreen = {
-                    viewModel.handleIntent(QuizIntent.NavigateToResult)
-                }
-            )
+            Box(modifier = Modifier.fillMaxSize()) {
+
+                QuizBody(
+                    quizData = viewModel.getQuiz(),
+                    quizState = quizState,
+                    updateSelectedAnswers = { answers ->
+                        viewModel.handleIntent(QuizIntent.UpdateSelectedAnswers(answers))
+                    },
+                    submitAnswer = {
+                        viewModel.handleIntent(QuizIntent.SubmitAnswer)
+                    },
+                    skipQuestion = {
+                        navigateToNextQuestion()
+                    },
+                    moveToNextQuestion = {
+                        navigateToNextQuestion()
+                    },
+                    navigateToResultScreen = {
+                        viewModel.handleIntent(QuizIntent.NavigateToResult)
+                    }
+                )
+                // Overlay animations
+                QuizOverlayAnimation(
+                    resultState = quizResultState,
+                    onAnimationEnd = {
+                        //resultState = false
+                    } // reset after animation
+                )
+            }
         }
     }
 }

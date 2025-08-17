@@ -17,6 +17,7 @@ androidxHiltCompiler = "1.2.0" # For androidx.hilt dependencies like navigation-
 # KSP version (if you plan to use KSP instead of KAPT)
 ksp = "2.2.0-2.0.2"
 loggingInterceptor = "5.1.0"
+lottieCompose = "6.6.7"
 retrofit = "3.0.0"
 navigationevent = "1.0.0-alpha06"
 
@@ -45,6 +46,7 @@ hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hil
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "androidxHiltCompiler" }
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "androidxHiltCompiler" }
 logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
+lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 androidx-navigationevent = { group = "androidx.navigationevent", name = "navigationevent", version.ref = "navigationevent" }
 

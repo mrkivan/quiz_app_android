@@ -31,6 +31,9 @@ class QuizViewModel @Inject constructor(
     private val _quizState = MutableStateFlow(QuizState())
     val quizState: StateFlow<QuizState> = _quizState.asStateFlow()
 
+    private val _quizResultState = MutableStateFlow<Boolean?>(null)
+    val quizResultState: StateFlow<Boolean?> = _quizResultState.asStateFlow()
+
     private val cacheQuizList = mutableListOf<QuizData>()
 
     private val _navigationEvents = MutableSharedFlow<QuizNavEvent>()
@@ -90,16 +93,13 @@ class QuizViewModel @Inject constructor(
     }
 
     private fun submitAnswer() {
-        _quizState.value = _quizState.value.copy(isSubmitted = true, showExplanation = true)
-    }
+        val currentQuiz = cacheQuizList[currentQuizPosition]
+        val isCorrect =
+            currentQuiz.correctAnswer.answerId.toSet() == _quizState.value.selectedAnswers.toSet()
 
-    private fun skipQuestion() {
-        /*_quizState.value = _quizState.value.copy(
-            isSubmitted = false,
-            showExplanation = false,
-            selectedAnswers = emptyList()
-        )*/
-        moveToNextQuestion()
+        _quizState.value = _quizState.value.copy(isSubmitted = true, showExplanation = true)
+        _quizResultState.value = isCorrect
+
     }
 
     fun showExitConfirmationDialog(): Boolean {
@@ -108,6 +108,7 @@ class QuizViewModel @Inject constructor(
 
     fun getQuizId() = currentQuizPosition + 1
     private fun moveToNextQuestion(isSkipped: Boolean = false) {
+        _quizResultState.value = null
         saveResult(isSkipped)
 
         val currentData: QuizScreenData? = (state.value as? QuizAppUiState.Success)?.data
