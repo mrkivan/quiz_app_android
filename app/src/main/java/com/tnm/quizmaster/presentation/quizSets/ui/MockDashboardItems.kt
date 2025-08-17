@@ -62,7 +62,7 @@ fun generateMockResultData(): ResultData {
 
     val totalCorrect = mockItems.count { it.result }
     val totalQuestions = mockItems.size
-    val percentage = (totalCorrect * 100 / totalQuestions).toString() + "%"
+    val percentage = (totalCorrect * 100 / totalQuestions)
 
     return ResultData(
         quizTitle = "General Knowledge Quiz",

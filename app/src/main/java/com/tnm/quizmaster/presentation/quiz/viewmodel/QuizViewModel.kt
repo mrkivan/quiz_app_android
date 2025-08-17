@@ -1,6 +1,5 @@
 package com.tnm.quizmaster.presentation.quiz.viewmodel
 
-import android.annotation.SuppressLint
 import androidx.lifecycle.viewModelScope
 import com.tnm.quizmaster.domain.model.quiz.QuizData
 import com.tnm.quizmaster.domain.model.result.ResultData
@@ -171,15 +170,11 @@ class QuizViewModel @Inject constructor(
         return resultItems.count { it.result }
     }
 
-    @SuppressLint("DefaultLocale")
-    fun getResultPercentage(correctAnswers: Int): String {
+    fun getResultPercentage(correctAnswers: Int): Int {
         val totalQuestions = cacheQuizList.count()
         return if (totalQuestions > 0) {
-            val percentage = (correctAnswers.toDouble() / totalQuestions.toDouble()) * 100
-            String.format("%.2f", percentage) + "%"
-        } else {
-            "0%"
-        }
+            ((correctAnswers.toDouble() / totalQuestions.toDouble()) * 100).toInt()
+        } else 0
     }
 
     fun isLastItem(): Boolean {

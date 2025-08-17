@@ -25,7 +25,6 @@ import com.tnm.quizmaster.NavKeys
 import com.tnm.quizmaster.QuizMasterDestinations
 import com.tnm.quizmaster.R
 import com.tnm.quizmaster.domain.model.quizset.QuizSetData
-import com.tnm.quizmaster.presentation.quiz.route.QuizScreenData
 import com.tnm.quizmaster.presentation.quizSets.intent.QuizSetIntent
 import com.tnm.quizmaster.presentation.quizSets.intent.QuizSetNavEvent
 import com.tnm.quizmaster.presentation.quizSets.viewmodel.QuizSetViewModel
@@ -79,22 +78,21 @@ fun QuizSetScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(
-                items = data?.sections?.sortedBy { it.position }.orEmpty(),
+                items = data?.sections.orEmpty(),
                 key = { section -> section.fileName }
             ) { section ->
-
                 QuizSetScreenItem(
-                    section = section,
-                    previousResult = viewModel.getResultData(section.fileName),
-                    onClick = {
-                        val quizScreenData = QuizScreenData(
-                            quizTitle = data?.title.orEmpty(),
-                            quizDescription = data?.description.orEmpty(),
-                            quizSection = section
-                        )
-                        viewModel.handleIntent(QuizSetIntent.NavigateToQuiz(quizScreenData))
+                    quizSetItemData = section,
+                    onItemClick = {
+                        viewModel.handleIntent(QuizSetIntent.NavigateToQuiz(section))
                     },
-                    navController = navController
+                    navigateToResultView = { fileName:String ->
+                        navController.currentBackStackEntry?.savedStateHandle?.set(
+                            NavKeys.DATA_KEY_RESULT,
+                            fileName
+                        )
+                        navController.navigate(QuizMasterDestinations.ROUTE_RESULT)
+                    }
                 )
             }
         }

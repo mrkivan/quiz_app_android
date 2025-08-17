@@ -40,6 +40,6 @@ fun getMockResultData(): ResultData {
         ),
         totalCorrectAnswers = 1,
         totalQuestions = 1,
-        resultPercentage = ""
+        resultPercentage = 0
     )
 }

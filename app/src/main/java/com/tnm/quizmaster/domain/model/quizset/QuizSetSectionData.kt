@@ -1,6 +1,7 @@
 package com.tnm.quizmaster.domain.model.quizset
 
 import android.os.Parcelable
+import com.tnm.quizmaster.domain.model.result.ResultData
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -18,5 +19,6 @@ data class QuizSetData(
         val description: String,
         val position: Int,
         val fileName: String,
+        var previousResult: ResultData? = null
     ) : Parcelable
 }

@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -16,12 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import com.tnm.quizmaster.NavKeys
-import com.tnm.quizmaster.QuizMasterDestinations
+import com.tnm.quizmaster.R
 import com.tnm.quizmaster.domain.model.quizset.QuizSetData
 import com.tnm.quizmaster.domain.model.result.ResultData
 import com.tnm.quizmaster.presentation.utils.ui.BaseCardView
@@ -33,10 +31,9 @@ import com.tnm.quizmaster.presentation.utils.ui.TvQuizBodyTitle
 
 @Composable
 fun QuizSetScreenItem(
-    section: QuizSetData.SectionItem,
-    previousResult: ResultData?,
-    onClick: () -> Unit,
-    navController: NavHostController,
+    quizSetItemData: QuizSetData.SectionItem,
+    onItemClick: () -> Unit,
+    navigateToResultView: (fileName: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -50,7 +47,7 @@ fun QuizSetScreenItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
-                onClick = onClick,
+                onClick = onItemClick,
                 bodyContent = {
 
                     Column(
@@ -58,20 +55,17 @@ fun QuizSetScreenItem(
                             .padding(start = 16.dp),
                         verticalArrangement = Arrangement.Center
                     ) {
-                        TvQuizBodyTitle(section.title)
+                        TvQuizBodyTitle(quizSetItemData.title)
 
                         SpacerSmallHeight()
 
-                        TvQuizBodyDesc(section.description)
+                        TvQuizBodyDesc(quizSetItemData.description)
 
-                        previousResult?.let {
+                        quizSetItemData.previousResult?.let {
                             SpacerSmallHeight()
                             PreviousResultButton(it) {
-                                navController.currentBackStackEntry?.savedStateHandle?.set(
-                                    NavKeys.DATA_KEY_RESULT,
-                                    section.fileName
-                                )
-                                navController.navigate(QuizMasterDestinations.ROUTE_RESULT)
+                                navigateToResultView.invoke(quizSetItemData.fileName)
+
                             }
                         }
                     }// Column end
@@ -79,7 +73,7 @@ fun QuizSetScreenItem(
             )
 
             CircleWithNumber(
-                number = section.position,
+                number = quizSetItemData.position,
                 modifier = Modifier.align(Alignment.CenterStart)
             )
         }// box with circle end
@@ -91,11 +85,6 @@ fun QuizSetScreenItem(
 fun PreviousResultButton(resultData: ResultData?, navigateToResultView: () -> Unit) {
     if (resultData == null) return
 
-    val totalQuestions = resultData.resultItems.size
-    val correctAnswers = resultData.resultItems.count { it.result }
-    val resultPercentage = if (totalQuestions > 0) {
-        (correctAnswers * 100f / totalQuestions).toInt()
-    } else 0
     SpacerLargeHeight()
     Button(
         onClick = { navigateToResultView() },
@@ -107,9 +96,9 @@ fun PreviousResultButton(resultData: ResultData?, navigateToResultView: () -> Un
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Previous Result: $resultPercentage%")
+            Text(stringResource(R.string.previous_result, resultData.resultPercentage))
             Icon(
-                imageVector = Icons.Default.ArrowForward,
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = "Navigate to result"
             )
         }
@@ -122,10 +111,9 @@ fun PreviousResultButton(resultData: ResultData?, navigateToResultView: () -> Un
 fun QuizSetScreenItemPreview() {
     MaterialTheme {
         QuizSetScreenItem(
-            section = getMockQuizSetData(),
-            previousResult = generateMockResultData(),
-            onClick = {},
-            navController = rememberNavController(),
+            quizSetItemData = getMockQuizSetData(),
+            onItemClick = {},
+            navigateToResultView = {},
             modifier = Modifier,
         )
     }

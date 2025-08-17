@@ -10,7 +10,7 @@ data class ResultData(
     val resultItems: List<Item>,
     val totalCorrectAnswers: Int,
     val totalQuestions: Int,
-    val resultPercentage: String
+    val resultPercentage: Int,
 ) : Parcelable {
     @Parcelize
     data class Item(
