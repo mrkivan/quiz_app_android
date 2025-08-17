@@ -1,6 +1,5 @@
 package com.tnm.quizmaster.presentation.quiz.ui
 
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -78,7 +77,7 @@ fun QuizScreen(
         }
     }
 
-    // UI
+    // Exit dialog when navigate to back
     ConfirmDialog(
         title = stringResource(R.string.dialog_exit_title),
         message = stringResource(R.string.dialog_exit_message),
@@ -93,8 +92,8 @@ fun QuizScreen(
     PlaceholderScaffold(
         toolbarConfig = QuizAppToolbar(
             title = when (uiState) {
-                QuizAppUiState.Loading -> stringResource(R.string.label_loading)
-                is QuizAppUiState.Success -> (uiState as QuizAppUiState.Success<QuizScreenData>).data.quizSection?.title.orEmpty()
+                QuizAppUiState.Loading -> quizScreenData?.quizSection?.title.orEmpty()
+                is QuizAppUiState.Success -> quizScreenData?.quizSection?.title.orEmpty()
                 is QuizAppUiState.Error -> stringResource(R.string.label_error)
             },
             navigationIcon = Icons.AutoMirrored.Filled.ArrowBack,
@@ -114,11 +113,9 @@ fun QuizScreen(
             },
             label = "quiz-slide"
         ) { data ->
-            Log.d("QuizScreen", "QuizScreen: ${data.quizTitle}")
             Box(modifier = Modifier.fillMaxSize()) {
-
                 QuizBody(
-                    quizData = viewModel.getQuiz(),
+                    quizData = data,
                     quizState = quizState,
                     updateSelectedAnswers = { answers ->
                         viewModel.handleIntent(QuizIntent.UpdateSelectedAnswers(answers))
@@ -140,8 +137,8 @@ fun QuizScreen(
                 QuizOverlayAnimation(
                     resultState = quizResultState,
                     onAnimationEnd = {
-                        //resultState = false
-                    } // reset after animation
+                        // do nothing now, maybe for future
+                    }
                 )
             }
         }

@@ -9,7 +9,6 @@ import com.tnm.quizmaster.presentation.quiz.intent.QuizIntent
 import com.tnm.quizmaster.presentation.quiz.intent.QuizNavEvent
 import com.tnm.quizmaster.presentation.quiz.route.QuizScreenData
 import com.tnm.quizmaster.presentation.quiz.state.QuizState
-import com.tnm.quizmaster.presentation.utils.state.QuizAppUiState
 import com.tnm.quizmaster.presentation.utils.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -26,20 +25,22 @@ import javax.inject.Inject
 class QuizViewModel @Inject constructor(
     private val getQuizDataUseCase: GetQuizDataBySetAndTopicUseCase,
     private val saveResultDataUseCase: SaveResultDataUseCase
-) : BaseViewModel<QuizScreenData>() {
+) : BaseViewModel<QuizData>() {
     private val _quizState = MutableStateFlow(QuizState())
     val quizState: StateFlow<QuizState> = _quizState.asStateFlow()
 
     private val _quizResultState = MutableStateFlow<Boolean?>(null)
     val quizResultState: StateFlow<Boolean?> = _quizResultState.asStateFlow()
 
-    private val cacheQuizList = mutableListOf<QuizData>()
+    private var cacheQuizList = listOf<QuizData>()
 
     private val _navigationEvents = MutableSharedFlow<QuizNavEvent>()
     val navigationEvents = _navigationEvents.asSharedFlow()
 
     private val resultItems = mutableListOf<ResultData.Item>()
     private var currentQuizPosition: Int = 0
+
+    private var cacheScreenData: QuizScreenData? = null
 
     fun handleIntent(intent: QuizIntent) {
         when (intent) {
@@ -67,6 +68,7 @@ class QuizViewModel @Inject constructor(
     }
 
     private fun fetchQuiz(quizScreenData: QuizScreenData) {
+        cacheScreenData = quizScreenData
         viewModelScope.launch {
             getQuizDataUseCase(quizScreenData.quizSection?.fileName.orEmpty())
                 .onStart {
@@ -76,8 +78,8 @@ class QuizViewModel @Inject constructor(
                     setError(e.message.orEmpty())
                 }
                 .collect { quizItems ->
-                    cacheQuizList.addAll(quizItems)
-                    setSuccess(quizScreenData.copy(currentQuizPosition = 0))
+                    cacheQuizList = quizItems.shuffled()
+                    setSuccess(cacheQuizList[0])
                     _quizState.value = QuizState(
                         isLastItem = isLastItem(),
                         currentQuestionNumber = currentQuizPosition + 1,
@@ -110,26 +112,21 @@ class QuizViewModel @Inject constructor(
         _quizResultState.value = null
         saveResult(isSkipped)
 
-        val currentData: QuizScreenData? = (state.value as? QuizAppUiState.Success)?.data
-        currentData?.let { data ->
-            val nextIndex = data.currentQuizPosition + 1
-            if (nextIndex < cacheQuizList.size) {
-                currentQuizPosition = nextIndex
-                setSuccess(
-                    data.copy(
-                        currentQuizPosition = nextIndex,
-                    )
-                )
-                _quizState.value = QuizState(
-                    currentQuestionNumber = currentQuizPosition + 1,
-                    totalQuestions = cacheQuizList.size,
-                    isLastItem = isLastItem()
-                )
+        val nextIndex = currentQuizPosition + 1
+        if (nextIndex < cacheQuizList.size) {
+            currentQuizPosition = nextIndex
 
-            } else {
-                navigateToResultScreen()
-            }
+            setSuccess(cacheQuizList[currentQuizPosition])
+            _quizState.value = QuizState(
+                currentQuestionNumber = currentQuizPosition + 1,
+                totalQuestions = cacheQuizList.size,
+                isLastItem = isLastItem()
+            )
+
+        } else {
+            navigateToResultScreen()
         }
+
 
     }
 
@@ -141,8 +138,7 @@ class QuizViewModel @Inject constructor(
     private fun navigateToResultScreen() {
         saveResult()
 
-        val currentData: QuizScreenData? = (state.value as? QuizAppUiState.Success)?.data
-        currentData?.let { data ->
+        cacheScreenData?.let { data ->
 
             val correctAnswers = getCorrectResultsCount()
 
@@ -182,8 +178,7 @@ class QuizViewModel @Inject constructor(
     }
 
     private fun getResultKey(): String {
-        val currentData: QuizScreenData? = (state.value as? QuizAppUiState.Success)?.data
-        currentData?.let { data ->
+        cacheScreenData?.let { data ->
             return data.quizSection?.fileName.orEmpty()
         }
         return ""
