@@ -26,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,13 +33,17 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.tnm.quizmaster.R
 import com.tnm.quizmaster.domain.model.result.ResultData
+import com.tnm.quizmaster.presentation.result.model.ResultScreenData
 import com.tnm.quizmaster.presentation.result.viewmodel.ResultViewModel
 import com.tnm.quizmaster.presentation.utils.state.QuizAppUiState
 import com.tnm.quizmaster.presentation.utils.ui.AppCardDefaults
+import com.tnm.quizmaster.presentation.utils.ui.AppColors
+import com.tnm.quizmaster.presentation.utils.ui.AppDimens
 import com.tnm.quizmaster.presentation.utils.ui.CircularPercentageProgress
 import com.tnm.quizmaster.presentation.utils.ui.PlaceholderScaffold
 import com.tnm.quizmaster.presentation.utils.ui.QuizAppToolbar
 import com.tnm.quizmaster.presentation.utils.ui.SpacerMediumHeight
+import com.tnm.quizmaster.presentation.utils.ui.toProgress
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,13 +58,11 @@ fun ResultScreen(
     LaunchedEffect(Unit) {
         viewModel.getResult(key)
     }
-    // 1️⃣ Prepare filtered lists once
-
     PlaceholderScaffold(
         toolbarConfig = QuizAppToolbar(
             title = when (uiState) {
                 QuizAppUiState.Loading -> stringResource(R.string.label_loading)
-                is QuizAppUiState.Success -> (uiState as QuizAppUiState.Success<ResultData>).data.quizTitle.orEmpty()
+                is QuizAppUiState.Success -> (uiState as QuizAppUiState.Success<ResultScreenData>).data.quizTitle.orEmpty()
                 is QuizAppUiState.Error -> stringResource(R.string.label_error)
             },
             navigationIcon = Icons.AutoMirrored.Filled.ArrowBack,
@@ -73,20 +74,16 @@ fun ResultScreen(
 
     ) { paddingValues, data ->
         // 1. Prepare filtered lists once
-        val currentItems = remember(data.resultItems) { data.resultItems.filter { it.result } }
-        val skippedItems = remember(data.resultItems) { data.resultItems.filter { it.isSkipped } }
-        val incorrectItems =
-            remember(data.resultItems) { data.resultItems.filter { !it.result && !it.isSkipped } }
-        val currentTabTitle = stringResource(R.string.tab_current, currentItems.size)
-        val skippedTabTitle = stringResource(R.string.tab_skipped, skippedItems.size)
-        val incorrectTabTitle = stringResource(R.string.tab_incorrect, incorrectItems.size)
+        val currentTabTitle = stringResource(R.string.tab_current, data.totalCorrectItems)
+        val skippedTabTitle = stringResource(R.string.tab_skipped, data.totalSkippedItems)
+        val incorrectTabTitle = stringResource(R.string.tab_incorrect, data.totalInCorrectItems)
 
         // 2. Build dynamic tabs
-        val tabs = remember(data.resultItems) {
+        val tabs = remember(data.quizTitle) {
             mutableListOf<Pair<String, List<ResultData.Item>>>().apply {
-                if (currentItems.isNotEmpty()) add(currentTabTitle to currentItems)
-                if (skippedItems.isNotEmpty()) add(skippedTabTitle to skippedItems)
-                if (incorrectItems.isNotEmpty()) add(incorrectTabTitle to incorrectItems)
+                if (data.totalCorrectItems > 0) add(currentTabTitle to data.correctItems)
+                if (data.totalSkippedItems > 0) add(skippedTabTitle to data.skippedItems)
+                if (data.totalInCorrectItems > 0) add(incorrectTabTitle to data.incorrectItems)
             }
         }
 
@@ -130,14 +127,7 @@ fun ResultScreen(
 }
 
 @Composable
-fun ResultReportCard(data: ResultData) {
-    val totalQuestions = data.resultItems.size
-    val correctAnswers = data.resultItems.count { it.result }
-    val progress = if (totalQuestions > 0) {
-        correctAnswers.toFloat() / totalQuestions.toFloat()
-    } else {
-        0f
-    }
+fun ResultReportCard(data: ResultScreenData) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -171,24 +161,24 @@ fun ResultReportCard(data: ResultData) {
                     Text(
                         text = stringResource(
                             id = R.string.result_total_questions,
-                            totalQuestions
+                            data.totalQuestions
                         )
                     )
                     Text(
                         text = stringResource(
                             id = R.string.result_correct_answers,
-                            correctAnswers
+                            data.totalInCorrectItems
                         )
                     )
                 }
 
                 // Right side: Circular progress
                 CircularPercentageProgress(
-                    progress = progress,
-                    size = 60.dp,
-                    strokeWidth = 8.dp,
-                    progressColor = Color(0xFFFFC107),
-                    backgroundColor = Color(0xFF1E1E1E)
+                    progress = data.resultPercentage.toProgress(),
+                    size = AppDimens.ProgressIndicatorSize,
+                    strokeWidth = AppDimens.ProgressStrokeWidth,
+                    progressColor = AppColors.ProgressColor,
+                    backgroundColor = AppColors.ProgressBackground
                 )
             }
         }

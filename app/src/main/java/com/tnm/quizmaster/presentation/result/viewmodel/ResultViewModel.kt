@@ -1,8 +1,8 @@
 package com.tnm.quizmaster.presentation.result.viewmodel
 
 import androidx.lifecycle.viewModelScope
-import com.tnm.quizmaster.domain.model.result.ResultData
 import com.tnm.quizmaster.domain.usecase.result.GetResultDataUseCase
+import com.tnm.quizmaster.presentation.result.model.ResultScreenData
 import com.tnm.quizmaster.presentation.utils.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
@@ -13,7 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ResultViewModel @Inject constructor(
     private val getResultDataUseCase: GetResultDataUseCase,
-) : BaseViewModel<ResultData>() {
+) : BaseViewModel<ResultScreenData>() {
     fun getResult(key: String) {
         viewModelScope.launch {
             getResultDataUseCase(key)
@@ -26,13 +26,24 @@ class ResultViewModel @Inject constructor(
                 .collect { result ->
                     if (result == null) setError(ERROR_DATA_NOT_FOUND)
                     else {
+                        // could be optimized with single pass filter for large items
+                        val correctItems = result.resultItems.filter { it.result }
+                        val skippedItems = result.resultItems.filter { it.isSkipped }
+                        val incorrectItems =
+                            result.resultItems.filter { !it.result && !it.isSkipped }
+
                         setSuccess(
-                            ResultData(
+                            ResultScreenData(
                                 quizTitle = result.quizTitle,
                                 quizDescription = result.quizDescription,
-                                resultItems = result.resultItems,
-                                totalCorrectAnswers = result.totalCorrectAnswers,
-                                totalQuestions = result.totalQuestions,
+
+                                correctItems = correctItems,
+                                skippedItems = skippedItems,
+                                incorrectItems = incorrectItems,
+                                totalCorrectItems = correctItems.size,
+                                totalSkippedItems = skippedItems.size,
+                                totalInCorrectItems = incorrectItems.size,
+                                totalQuestions = result.resultItems.size,
                                 resultPercentage = result.resultPercentage
                             )
                         )

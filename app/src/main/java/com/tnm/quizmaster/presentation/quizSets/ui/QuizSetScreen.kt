@@ -86,7 +86,7 @@ fun QuizSetScreen(
                     onItemClick = {
                         viewModel.handleIntent(QuizSetIntent.NavigateToQuiz(section))
                     },
-                    navigateToResultView = { fileName:String ->
+                    navigateToResultView = { fileName: String ->
                         navController.currentBackStackEntry?.savedStateHandle?.set(
                             NavKeys.DATA_KEY_RESULT,
                             fileName

@@ -10,12 +10,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.tnm.quizmaster.R
 import com.tnm.quizmaster.domain.model.result.ResultData
 import com.tnm.quizmaster.presentation.utils.ui.AppCardDefaults
+import com.tnm.quizmaster.presentation.utils.ui.AppColors
 import com.tnm.quizmaster.presentation.utils.ui.SpacerSmallHeight
 
 
@@ -30,7 +33,7 @@ fun ResultItemRow(item: ResultData.Item) {
             Text(text = item.question, fontWeight = FontWeight.Bold)
             SpacerSmallHeight()
             Text(
-                text = "Answer:",
+                text = stringResource(R.string.label_answer),
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(top = 4.dp)
             )
@@ -38,7 +41,7 @@ fun ResultItemRow(item: ResultData.Item) {
                 item.correctAnswer.forEach { answer ->
                     Text(
                         text = "• $answer",
-                        color = if (item.result) Color(0xFF4CAF50) else Color.Red
+                        color = if (item.result) AppColors.SuccessColor else Color.Red
                     )
                 }
             }
@@ -59,7 +62,7 @@ fun PreviewResultItemRow() {
         Box(
             modifier = Modifier.padding(16.dp)
         ) {
-            ResultItemRow(item = getMockResultData().resultItems[0])
+            ResultItemRow(item = getMockResultScreenItem())
         }
     }
 }

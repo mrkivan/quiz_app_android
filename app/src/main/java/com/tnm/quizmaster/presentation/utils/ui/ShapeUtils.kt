@@ -124,8 +124,8 @@ fun CircularPercentageProgress(
     progress: Float, // 0f..1f
     size: Dp = 50.dp,
     strokeWidth: Dp = 8.dp,
-    progressColor: Color = Color(0xFF4CAF50),
-    backgroundColor: Color = Color(0xFFE0E0E0),
+    progressColor: Color = AppColors.SuccessColor,
+    backgroundColor: Color = AppColors.LightGray,
     percentageTextStyle: TextStyle = TextStyle(
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
@@ -191,18 +191,16 @@ fun PreviewQuizProgressWithShape() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewCircularPercentageProgress() {
-    val scorePercentage = 0.7f // 70%
-
     MaterialTheme {
         Box(
             modifier = Modifier.padding(16.dp)
         ) {
             CircularPercentageProgress(
-                progress = scorePercentage,
+                progress = 70.toProgress(),
                 size = 120.dp,
                 strokeWidth = 12.dp,
-                progressColor = Color(0xFF4CAF50),
-                backgroundColor = Color(0xFFE0E0E0)
+                progressColor = AppColors.ProgressColor,
+                backgroundColor = AppColors.ProgressBackground
             )
 
         }

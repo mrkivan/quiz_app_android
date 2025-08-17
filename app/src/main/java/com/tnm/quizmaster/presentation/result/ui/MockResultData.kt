@@ -1,6 +1,7 @@
 package com.tnm.quizmaster.presentation.result.ui
 
 import com.tnm.quizmaster.domain.model.result.ResultData
+import com.tnm.quizmaster.presentation.result.model.ResultScreenData
 
 fun getMockResultScreenItem(
     result: Boolean = false,
@@ -16,11 +17,11 @@ fun getMockResultScreenItem(
     )
 }
 
-fun getMockResultData(): ResultData {
-    return ResultData(
+fun getMockResultData(): ResultScreenData {
+    return ResultScreenData(
         quizTitle = "General Knowledge Quiz",
         quizDescription = "This is a sample quiz description.",
-        resultItems = listOf(
+        correctItems = listOf(
             ResultData.Item(
                 questionId = 1,
                 question = "What is the capital of France?",
@@ -28,7 +29,9 @@ fun getMockResultData(): ResultData {
                 correctAnswer = listOf("Paris"),
                 explanation = "Paris is the capital and largest city of France.",
                 result = true
-            ),
+            )
+        ),
+        incorrectItems = listOf(
             ResultData.Item(
                 questionId = 2,
                 question = "What is 2 + 2?",
@@ -38,8 +41,11 @@ fun getMockResultData(): ResultData {
                 result = false
             )
         ),
-        totalCorrectAnswers = 1,
+        skippedItems = emptyList(),
+        totalCorrectItems = 1,
+        totalSkippedItems = 0,
+        totalInCorrectItems = 1,
         totalQuestions = 1,
-        resultPercentage = 0
+        resultPercentage = 50
     )
 }

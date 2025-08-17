@@ -16,8 +16,8 @@ fun QuizOverlayAnimation(
         contentAlignment = Alignment.Center //centers child
     ) {
         when (resultState) {
-            true -> QuizAnswerAnimation (  true ){onAnimationEnd.invoke() }
-            false -> QuizAnswerAnimation (  false ){onAnimationEnd.invoke() }
+            true -> QuizAnswerAnimation(true) { onAnimationEnd.invoke() }
+            false -> QuizAnswerAnimation(false) { onAnimationEnd.invoke() }
             null -> {} // nothing
         }
     }
