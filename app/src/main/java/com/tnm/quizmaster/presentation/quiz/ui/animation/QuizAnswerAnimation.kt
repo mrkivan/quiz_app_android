@@ -2,9 +2,6 @@ package com.tnm.quizmaster.presentation.quiz.ui.animation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,6 +15,7 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.tnm.quizmaster.presentation.utils.ui.lottieExitTransition
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -46,10 +44,7 @@ fun QuizAnswerAnimation(isSuccess: Boolean, onAnimationEnd: () -> Unit) {
 
     AnimatedVisibility(
         visible = isVisible,
-        exit = fadeOut(animationSpec = tween(600)) + scaleOut(
-            targetScale = 0.7f,
-            animationSpec = tween(600)
-        )
+        exit = lottieExitTransition()
     ) {
         LottieAnimation(
             composition = composition,

@@ -1,9 +1,6 @@
 package com.tnm.quizmaster.presentation.quiz.ui
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -29,6 +26,7 @@ import com.tnm.quizmaster.presentation.utils.state.QuizAppUiState
 import com.tnm.quizmaster.presentation.utils.ui.ConfirmDialog
 import com.tnm.quizmaster.presentation.utils.ui.PlaceholderScaffold
 import com.tnm.quizmaster.presentation.utils.ui.QuizAppToolbar
+import com.tnm.quizmaster.presentation.utils.ui.horizontalSlideTransition
 
 @Composable
 fun QuizScreen(
@@ -108,9 +106,7 @@ fun QuizScreen(
     ) { paddingValues, data ->
         AnimatedContent(
             targetState = data,
-            transitionSpec = {
-                slideInHorizontally { width -> width } togetherWith slideOutHorizontally { width -> -width }
-            },
+            transitionSpec = horizontalSlideTransition(),
             label = "quiz-slide"
         ) { data ->
             Box(modifier = Modifier.fillMaxSize()) {
