@@ -1,6 +1,7 @@
 package com.tnm.quizmaster.presentation.quiz.viewmodel
 
 import androidx.lifecycle.viewModelScope
+import com.tnm.quizmaster.domain.model.Resource
 import com.tnm.quizmaster.domain.model.quiz.QuizData
 import com.tnm.quizmaster.domain.model.result.ResultData
 import com.tnm.quizmaster.domain.usecase.quiz.GetQuizDataBySetAndTopicUseCase
@@ -78,13 +79,21 @@ class QuizViewModel @Inject constructor(
                     setError(e.message.orEmpty())
                 }
                 .collect { quizItems ->
-                    cacheQuizList = quizItems.shuffled()
-                    setSuccess(cacheQuizList[0])
-                    _quizState.value = QuizState(
-                        isLastItem = isLastItem(),
-                        currentQuestionNumber = currentQuizPosition + 1,
-                        totalQuestions = quizItems.size
-                    )
+                    when (quizItems) {
+                        is Resource.Failure -> setError(quizItems.error.message.orEmpty())
+                        is Resource.Success -> {
+                            cacheQuizList = quizItems.data.shuffled()
+
+                            setSuccess(cacheQuizList[0])
+                            _quizState.value = QuizState(
+                                isLastItem = isLastItem(),
+                                currentQuestionNumber = currentQuizPosition + 1,
+                                totalQuestions = cacheQuizList.size
+                            )
+                        }
+
+                    }
+
                 }
         }
     }
@@ -128,10 +137,6 @@ class QuizViewModel @Inject constructor(
         }
 
 
-    }
-
-    fun getQuiz(): QuizData {
-        return cacheQuizList[currentQuizPosition]
     }
 
     // Save all results using use case

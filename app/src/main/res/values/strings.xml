@@ -19,6 +19,7 @@
     <string name="btn_submit">Submit</string>
     <string name="btn_result">Result</string>
     <string name="btn_next">Next</string>
+    <string name="btn_retry">Retry</string>
     <!--Dialog strings-->
     <string name="dialog_skip_title">Skip this question!!!</string>
     <string name="dialog_skip_message">Do you really want to skip this?</string>

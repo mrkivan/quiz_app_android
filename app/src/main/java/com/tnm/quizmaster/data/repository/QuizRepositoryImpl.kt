@@ -4,6 +4,7 @@ import com.tnm.quizmaster.data.api.QuizApi
 import com.tnm.quizmaster.data.cache.CacheManager
 import com.tnm.quizmaster.data.mapper.toDomain
 import com.tnm.quizmaster.data.mapper.toQuizSetDomain
+import com.tnm.quizmaster.domain.model.Resource
 import com.tnm.quizmaster.domain.model.dashboard.DashboardData
 import com.tnm.quizmaster.domain.model.quiz.QuizData
 import com.tnm.quizmaster.domain.model.quizset.QuizSetData
@@ -17,17 +18,23 @@ class QuizRepositoryImpl @Inject constructor(
     private val cache: CacheManager
 ) : QuizRepository {
 
-    override fun getDashboardData(): Flow<DashboardData> = flow {
-        val cached = cache.getDashboard()
-        if (cached != null) {
-            emit(cached.toDomain())
-            return@flow
-        }
+    override fun getDashboardData(): Flow<Resource<DashboardData>> = flow {
+        try {
+            val cached = cache.getDashboard()
 
-        val remoteDto = api.getDashboard()
-        val remote = remoteDto.toDomain()
-        cache.saveDashboard(remote)
-        emit(remote)
+            if (cached != null) {
+                emit(Resource.Success(cached.toDomain()))
+                return@flow
+            }
+
+            val remoteDto = api.getDashboard()
+            val remote = remoteDto.toDomain()
+            cache.saveDashboard(remote)
+            emit(Resource.Success(remote))
+        } catch (e: Exception) {
+            // Emit the Failure state with the error
+            emit(Resource.Failure(e))
+        }
     }
 
     override fun getQuizListByTopic(topic: String): Flow<QuizSetData?> = flow {
@@ -40,14 +47,19 @@ class QuizRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getQuizzesBySetAndTopic(fileName: String): Flow<List<QuizData>> = flow {
-        val cached = cache.getQuiz(fileName)
-        if (cached != null) {
-            emit(cached.items.map { it.toDomain() })
-            return@flow
+    override fun getQuizzesBySetAndTopic(fileName: String): Flow<Resource<List<QuizData>>> = flow {
+        try {
+            val cached = cache.getQuiz(fileName)
+            if (cached != null) {
+                emit(Resource.Success(cached.items.map { it.toDomain() }))
+                return@flow
+            }
+            val remote = api.getQuizSet(fileName)
+            cache.saveQuiz(fileName, remote)
+            emit(Resource.Success(remote.items.map { it.toDomain() }))
+        } catch (e: Exception) {
+            // Emit the Failure state with the error
+            emit(Resource.Failure(e))
         }
-        val remote = api.getQuizSet(fileName)
-        cache.saveQuiz(fileName, remote)
-        emit(remote.items.map { it.toDomain() })
     }
 }

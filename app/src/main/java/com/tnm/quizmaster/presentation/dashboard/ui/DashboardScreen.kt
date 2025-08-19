@@ -29,11 +29,16 @@ fun DashboardScreen(
     viewModel: DashboardViewModel,
     navController: NavHostController
 ) {
-    val uiState by viewModel.state.collectAsState()
-
-    LaunchedEffect(Unit) {
+    fun loadData() {
         viewModel.handleIntent(DashboardIntent.LoadDashboard)
 
+    }
+
+    val uiState by viewModel.state.collectAsState()
+
+
+    LaunchedEffect(Unit) {
+        loadData()
         viewModel.navigationEvents.collect { event ->
             when (event) {
                 is DashboardNavEvent.NavigateToQuizSets -> {
@@ -50,7 +55,10 @@ fun DashboardScreen(
     PlaceholderScaffold(
         toolbarConfig = QuizAppToolbar(title = stringResource(R.string.app_name)),
         uiState = uiState,
-        modifier = Modifier
+        modifier = Modifier,
+        onRetryClicked = {
+            loadData()
+        }
     ) { paddingValues, data ->
 
         LazyColumn(

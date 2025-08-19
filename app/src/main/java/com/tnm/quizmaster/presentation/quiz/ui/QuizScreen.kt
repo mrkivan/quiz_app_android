@@ -22,7 +22,6 @@ import com.tnm.quizmaster.presentation.quiz.intent.QuizNavEvent
 import com.tnm.quizmaster.presentation.quiz.route.QuizScreenData
 import com.tnm.quizmaster.presentation.quiz.ui.animation.QuizOverlayAnimation
 import com.tnm.quizmaster.presentation.quiz.viewmodel.QuizViewModel
-import com.tnm.quizmaster.presentation.utils.state.QuizAppUiState
 import com.tnm.quizmaster.presentation.utils.ui.ConfirmDialog
 import com.tnm.quizmaster.presentation.utils.ui.PlaceholderScaffold
 import com.tnm.quizmaster.presentation.utils.ui.QuizAppToolbar
@@ -43,6 +42,12 @@ fun QuizScreen(
         }
     }
 
+    fun loadData() {
+        quizScreenData?.let {
+            viewModel.handleIntent(QuizIntent.LoadQuiz(it))
+        }
+    }
+
     val uiState by viewModel.state.collectAsState()
     val quizState by viewModel.quizState.collectAsState()
     val quizResultState by viewModel.quizResultState.collectAsState()
@@ -57,9 +62,7 @@ fun QuizScreen(
 
     // Observe one-time events
     LaunchedEffect(Unit) {
-        quizScreenData?.let {
-            viewModel.handleIntent(QuizIntent.LoadQuiz(it))
-        }
+        loadData()
 
         viewModel.navigationEvents.collect { event ->
             when (event) {
@@ -89,11 +92,7 @@ fun QuizScreen(
 
     PlaceholderScaffold(
         toolbarConfig = QuizAppToolbar(
-            title = when (uiState) {
-                QuizAppUiState.Loading -> quizScreenData?.quizSection?.title.orEmpty()
-                is QuizAppUiState.Success -> quizScreenData?.quizSection?.title.orEmpty()
-                is QuizAppUiState.Error -> stringResource(R.string.label_error)
-            },
+            title = quizScreenData?.quizSection?.title.orEmpty(),
             navigationIcon = Icons.AutoMirrored.Filled.ArrowBack,
             navigationIconContentDescription = stringResource(R.string.label_back),
             onNavigationClick = {
@@ -102,7 +101,10 @@ fun QuizScreen(
             },
         ),
         uiState = uiState,
-        modifier = Modifier
+        modifier = Modifier,
+        onRetryClicked = {
+            loadData()
+        }
     ) { paddingValues, data ->
         AnimatedContent(
             targetState = data,

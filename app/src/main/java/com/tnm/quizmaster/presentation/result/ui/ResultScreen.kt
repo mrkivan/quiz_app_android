@@ -71,7 +71,6 @@ fun ResultScreen(
         ),
         uiState = uiState,
         modifier = Modifier
-
     ) { paddingValues, data ->
         // 1. Prepare filtered lists once
         val currentTabTitle = stringResource(R.string.tab_current, data.totalCorrectItems)

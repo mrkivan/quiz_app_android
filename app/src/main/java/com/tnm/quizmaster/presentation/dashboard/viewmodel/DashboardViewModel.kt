@@ -1,6 +1,7 @@
 package com.tnm.quizmaster.presentation.dashboard.viewmodel
 
 import androidx.lifecycle.viewModelScope
+import com.tnm.quizmaster.domain.model.Resource
 import com.tnm.quizmaster.domain.model.dashboard.DashboardData
 import com.tnm.quizmaster.domain.usecase.dashboard.GetDashboardDataUseCase
 import com.tnm.quizmaster.presentation.dashboard.intent.DashboardIntent
@@ -37,7 +38,13 @@ class DashboardViewModel @Inject constructor(
                     setError(e.message.orEmpty())
                 }
                 .collect { dashboard ->
-                    setSuccess(dashboard)
+                    when (dashboard) {
+                        is Resource.Failure -> setError(dashboard.error.message.orEmpty())
+                        is Resource.Success -> {
+                            setSuccess(dashboard.data)
+                        }
+                    }
+
                 }
         }
     }
