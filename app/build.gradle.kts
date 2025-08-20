@@ -11,6 +11,7 @@ plugins {
 
     alias(libs.plugins.ksp)
     id("jacoco")
+    id("org.sonarqube")
 }
 
 android {
@@ -35,7 +36,7 @@ android {
         }
         release {
             buildConfigField("String", "BASE_URL", "\"https://production.yourdomain.com/api/\"")
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -155,8 +156,20 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     }
 }
 
-dependencies {
+sonarqube {
+    properties {
+        property("sonar.projectKey", "quiz_app_android")
+        property("sonar.projectName", "Quiz App Android")
+        property("sonar.host.url", "http://localhost:9000")
+        property("sonar.login", "PASTE_YOUR_TOKEN_HERE")
+        property("sonar.language", "kotlin")
+        property("sonar.sourceEncoding", "UTF-8")
+        property("sonar.sources", "src/main/java")
+        property("sonar.tests", "src/test/java,src/androidTest/java")
+    }
+}
 
+dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
