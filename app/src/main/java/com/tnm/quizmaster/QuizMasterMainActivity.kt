@@ -1,5 +1,6 @@
 package com.tnm.quizmaster
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,6 +11,7 @@ import androidx.compose.ui.Modifier
 import com.tnm.quizmaster.presentation.theme.QuizMasterAndroidJavaKotlinTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @AndroidEntryPoint
 class QuizMasterMainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,7 +20,7 @@ class QuizMasterMainActivity : ComponentActivity() {
 
         setContent {
             QuizMasterAndroidJavaKotlinTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
                     AppNavHost()
                 }
             }

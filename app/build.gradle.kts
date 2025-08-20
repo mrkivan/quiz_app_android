@@ -1,3 +1,6 @@
+import org.gradle.testing.jacoco.tasks.JacocoReport // Explicit import for JacocoReport
+import org.gradle.api.tasks.testing.Test // Explicit import for Test
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,6 +10,7 @@ plugins {
     alias(libs.plugins.hilt.android)
 
     alias(libs.plugins.ksp)
+    id("jacoco")
 }
 
 android {
@@ -25,6 +29,8 @@ android {
 
     buildTypes {
         debug {
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = false
             buildConfigField("String", "BASE_URL", "\"https://mrkivan.github.io/quiz_app_data/\"")
         }
         release {
@@ -57,6 +63,98 @@ kotlin {
         freeCompilerArgs.add("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
     }
 }
+/// Configure JaCoCo for unit tests
+jacoco {
+    toolVersion = "0.8.13" // Use a recent version
+}
+
+
+tasks.withType<Test> {
+    finalizedBy(tasks.named("jacocoTestReport"))
+}
+
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn(tasks.named("testReleaseUnitTest")) // Depend on release unit tests
+    group = "verification"
+    description = "Generates JaCoCo code coverage report for unit tests"
+
+
+    // Specify source and class directories
+    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
+    classDirectories.setFrom(
+        files(
+            "${layout.buildDirectory.get().asFile}/intermediates/javac/release/classes",
+            "${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/release"
+        ).map {
+            fileTree(it) {
+                include("**/*ViewModel.class") // Include only ViewModel classes
+                exclude(
+                    "**/R.class",
+                    "**/R$*.class",
+                    "**/BuildConfig.*",
+                    "**/Manifest*.*",
+                    "**/*Activity*.*",
+                    "**/*Fragment*.*",
+                    "**/databinding/**/*.*",
+                    "**/generated/**/*.*",
+                    "**/*ComposablesKt*.*", // Exclude Compose-generated classes
+                    "**/*_HiltModules*.*" // Exclude Hilt-generated classes
+                )
+            }
+        })
+    executionData.setFrom(files("${layout.buildDirectory.get().asFile}/jacoco/testReleaseUnitTest.exec"))
+
+
+    // Configure reports
+    reports {
+        xml.required.set(true)
+        html.required.set(true) // Use 'required' instead of 'enabled'
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/test/html"))
+    }
+
+
+    // Debug and print coverage percentage to console
+    doLast {
+        val execFile = file("${layout.buildDirectory.get().asFile}/jacoco/testReleaseUnitTest.exec")
+        println("Execution Data File: $execFile")
+        println("Execution Data Exists: ${execFile.exists()}")
+        val classDirs = files(
+            "${layout.buildDirectory.get().asFile}/intermediates/javac/release/classes",
+            "${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/release"
+        )
+        println("Class Directories: $classDirs")
+        println("Class Directories Exist: ${classDirs.all { it.exists() }}")
+        val report =
+            file("${layout.buildDirectory.get().asFile}/reports/jacoco/test/html/index.html")
+        println("Test Coverage Report: $report")
+        if (report.exists()) {
+            val content = report.readText()
+            println("HTML Report Content (first 1000 chars): ${content.take(1000)}")
+            // Try multiple regex patterns to parse coverage
+            val patterns = listOf(
+                Regex("<td>Total.*?(\\d+%)</td>"),
+                Regex("Total</span>.*?(\\d+\\.\\d+%)</td>"),
+                Regex("(\\d+\\.\\d+)%")
+            )
+            var coverageFound = false
+            for (pattern in patterns) {
+                val matcher = pattern.find(content)
+                if (matcher != null) {
+                    println("Total Test Coverage: ${matcher.groupValues[1]}")
+                    coverageFound = true
+                    break
+                }
+            }
+            if (!coverageFound) {
+                println("Could not parse coverage percentage from report")
+            }
+        } else {
+            println("Coverage report not found at $report")
+        }
+    }
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -89,13 +187,13 @@ dependencies {
 
     implementation(libs.lottie.compose)
     // Core testing
-        testImplementation(libs.junit)
-        testImplementation(libs.androidx.core.testing) // For InstantTaskExecutorRule
-        // Coroutines testing
-        testImplementation(libs.kotlinx.coroutines.test) // Use the latest version
-        testImplementation(libs.kotlin.test) // for kotlin.test.assertEquals
-        // --- MockK (for mocking coroutines, suspend functions, etc.) ---
-        testImplementation(libs.mockk)
-        // --- Turbine (Flow testing) ---
-        testImplementation(libs.turbine)
+    testImplementation(libs.junit)
+    testImplementation(libs.androidx.core.testing) // For InstantTaskExecutorRule
+    // Coroutines testing
+    testImplementation(libs.kotlinx.coroutines.test) // Use the latest version
+    testImplementation(libs.kotlin.test) // for kotlin.test.assertEquals
+    // --- MockK (for mocking coroutines, suspend functions, etc.) ---
+    testImplementation(libs.mockk)
+    // --- Turbine (Flow testing) ---
+    testImplementation(libs.turbine)
 }
