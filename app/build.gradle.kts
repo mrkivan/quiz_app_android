@@ -88,5 +88,14 @@ dependencies {
     implementation(libs.logging.interceptor)
 
     implementation(libs.lottie.compose)
-
+    // Core testing
+        testImplementation(libs.junit)
+        testImplementation(libs.androidx.core.testing) // For InstantTaskExecutorRule
+        // Coroutines testing
+        testImplementation(libs.kotlinx.coroutines.test) // Use the latest version
+        testImplementation(libs.kotlin.test) // for kotlin.test.assertEquals
+        // --- MockK (for mocking coroutines, suspend functions, etc.) ---
+        testImplementation(libs.mockk)
+        // --- Turbine (Flow testing) ---
+        testImplementation(libs.turbine)
 }

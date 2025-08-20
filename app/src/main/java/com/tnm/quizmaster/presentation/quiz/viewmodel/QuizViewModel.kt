@@ -82,9 +82,10 @@ class QuizViewModel @Inject constructor(
                     when (quizItems) {
                         is Resource.Failure -> setError(quizItems.error.message.orEmpty())
                         is Resource.Success -> {
+                            currentQuizPosition = 0
                             cacheQuizList = quizItems.data.shuffled()
 
-                            setSuccess(cacheQuizList[0])
+                            setSuccess(cacheQuizList[currentQuizPosition])
                             _quizState.value = QuizState(
                                 isLastItem = isLastItem(),
                                 currentQuestionNumber = currentQuizPosition + 1,
@@ -167,18 +168,18 @@ class QuizViewModel @Inject constructor(
 
     }
 
-    fun getCorrectResultsCount(): Int {
+    private fun getCorrectResultsCount(): Int {
         return resultItems.count { it.result }
     }
 
-    fun getResultPercentage(correctAnswers: Int): Int {
+    private fun getResultPercentage(correctAnswers: Int): Int {
         val totalQuestions = cacheQuizList.count()
         return if (totalQuestions > 0) {
             ((correctAnswers.toDouble() / totalQuestions.toDouble()) * 100).toInt()
         } else 0
     }
 
-    fun isLastItem(): Boolean {
+    private fun isLastItem(): Boolean {
         return currentQuizPosition + 1 == cacheQuizList.size
     }
 
